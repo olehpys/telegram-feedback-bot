@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 public class EventHandler implements RequestStreamHandler {
@@ -23,7 +24,8 @@ public class EventHandler implements RequestStreamHandler {
     String inputJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
     var apiGatewayRequest = JsonMapper.readValue(inputJson, ApiGatewayRequest.class);
-    log.info("Received telegram update event: {}", apiGatewayRequest.getBody());
+    var update = JsonMapper.readValue(apiGatewayRequest.getBody(), Update.class);
+    log.info("Received telegram update event: {}", update);
 
     buildApiGatewayResponse(outputStream);
   }

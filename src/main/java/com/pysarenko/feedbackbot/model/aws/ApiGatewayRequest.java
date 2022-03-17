@@ -1,9 +1,8 @@
 package com.pysarenko.feedbackbot.model.aws;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.pysarenko.feedbackbot.model.telegram.Update;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Builder(toBuilder = true)
 public class ApiGatewayRequest {
 
-  private Update body;
+  @JsonRawValue
+  private String body;
 }
