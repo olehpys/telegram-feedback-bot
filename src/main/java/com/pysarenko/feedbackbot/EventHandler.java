@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pysarenko.feedbackbot.model.aws.ApiGatewayRequest;
 import com.pysarenko.feedbackbot.model.aws.ApiGatewayResponse;
 import com.pysarenko.feedbackbot.telegram.TelegramMessageHandler;
+import com.pysarenko.feedbackbot.utils.JsonMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,8 +20,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 public class EventHandler implements RequestStreamHandler {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
-
+  private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final TelegramMessageHandler MESSAGE_HANDLER = new TelegramMessageHandler();
 
   @Override
@@ -47,7 +47,7 @@ public class EventHandler implements RequestStreamHandler {
         .isBase64Encoded(false)
         .build();
     var writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-    writer.write(objectMapper.writeValueAsString(response));
+    writer.write(MAPPER.writeValueAsString(response));
     writer.close();
   }
 }

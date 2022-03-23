@@ -1,10 +1,10 @@
 package com.pysarenko.feedbackbot.telegram;
 
 import static com.pysarenko.feedbackbot.model.Environment.ADMIN_ID;
-import static com.pysarenko.feedbackbot.telegram.TelegramUtils.START_MESSAGE_TEMPLATE;
-import static com.pysarenko.feedbackbot.telegram.TelegramUtils.START_PREFIX;
-import static com.pysarenko.feedbackbot.telegram.TelegramUtils.forwardMessage;
-import static com.pysarenko.feedbackbot.telegram.TelegramUtils.sendMessage;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_MESSAGE_TEMPLATE;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_PREFIX;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.forwardMessage;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.sendMessage;
 import static java.util.Objects.nonNull;
 
 import java.io.Serializable;

@@ -7,7 +7,8 @@ public enum Environment {
 
   BOT_TOKEN,
   BOT_USERNAME,
-  ADMIN_ID;
+  ADMIN_ID,
+  CHANNEL_ID;
 
   public String getValue() {
     return Optional.ofNullable(System.getenv(this.name()))
