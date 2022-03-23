@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pysarenko.feedbackbot.model.aws.ApiGatewayRequest;
 import com.pysarenko.feedbackbot.model.aws.ApiGatewayResponse;
+import com.pysarenko.feedbackbot.telegram.TelegramMessageHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,30 +14,39 @@ import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 public class EventHandler implements RequestStreamHandler {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
+  private static final TelegramMessageHandler MESSAGE_HANDLER = new TelegramMessageHandler();
+
   @Override
   public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
     String inputJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+    log.info("Received telegram update event in JSON: {}", inputJson);
 
     var apiGatewayRequest = JsonMapper.readValue(inputJson, ApiGatewayRequest.class);
     var update = JsonMapper.readValue(apiGatewayRequest.getBody(), Update.class);
     log.info("Received telegram update event: {}", update);
 
-    buildApiGatewayResponse(outputStream);
+    try {
+      MESSAGE_HANDLER.handleMessage(update);
+    } catch (TelegramApiException e) {
+      log.error("Telegram exception", e);
+    } finally {
+      buildApiGatewayResponse(outputStream);
+    }
   }
 
   private void buildApiGatewayResponse(OutputStream outputStream) throws IOException {
     var response = ApiGatewayResponse.builder()
         .statusCode(HttpStatus.SC_OK)
-        .body(objectMapper.writeValueAsString("ok"))
         .isBase64Encoded(false)
         .build();
-    OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+    var writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
     writer.write(objectMapper.writeValueAsString(response));
     writer.close();
   }
