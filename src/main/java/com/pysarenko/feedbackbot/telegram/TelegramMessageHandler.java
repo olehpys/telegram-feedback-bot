@@ -8,10 +8,12 @@ import static com.pysarenko.feedbackbot.utils.TelegramUtils.sendMessage;
 import static java.util.Objects.nonNull;
 
 import java.io.Serializable;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -41,8 +43,10 @@ public class TelegramMessageHandler {
     log.info("Forwarded message to admin from user with id=[{}] and username [{}]", fromChatId, username);
   }
 
-  private void sendReplyMessage(Update update, Message replyToMessage) throws TelegramApiException{
-    var userId = replyToMessage.getForwardFrom().getId();
+  private void sendReplyMessage(Update update, Message replyToMessage) throws TelegramApiException {
+    var userId = Optional.ofNullable(replyToMessage.getForwardFrom())
+        .map(User::getId)
+        .orElseThrow(TelegramApiException::new);
     var userName = replyToMessage.getForwardFrom().getUserName();
     var text = update.getMessage().getText();
     var message = sendMessage(String.valueOf(userId), text);
