@@ -23,9 +23,14 @@ public class TelegramMessageHandler {
   private static final AbsSender SENDER = new TelegramSender();
 
   public void handleMessage(Update update) throws TelegramApiException {
-    sendWelcomeMessage(update);
+    var message = update.getMessage();
+    if (message == null || message.getText() == null){
+      return;
+    }
 
-    var replyToMessage = update.getMessage().getReplyToMessage();
+    sendWelcomeMessage(message);
+
+    var replyToMessage = message.getReplyToMessage();
     if (nonNull(replyToMessage)) {
       sendReplyMessage(update, replyToMessage);
     } else {
@@ -55,13 +60,10 @@ public class TelegramMessageHandler {
     log.info("Sent message with id [{}] to userId [{}] with username [{}]", execute.getMessageId(), userId, userName);
   }
 
-  private void sendWelcomeMessage(Update update) throws TelegramApiException {
-    if (update.getMessage().getText() == null) {
-      return;
-    }
-    if (START_PREFIX.contains(update.getMessage().getText())) {
-      var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
-      var username = String.valueOf(update.getMessage().getFrom().getUserName());
+  private void sendWelcomeMessage(Message message) throws TelegramApiException {
+    if (START_PREFIX.contains(message.getText())) {
+      var fromChatId = String.valueOf(message.getFrom().getId());
+      var username = String.valueOf(message.getFrom().getUserName());
       send(sendMessage(fromChatId, START_MESSAGE_TEMPLATE));
       log.info("Sent welcome message to user with id [{}] and username [{}]", fromChatId, username);
     }
