@@ -3,11 +3,12 @@ package com.pysarenko.feedbackbot.telegram;
 import static com.pysarenko.feedbackbot.model.Environment.ADMIN_ID;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_MESSAGE_TEMPLATE;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_PREFIX;
-import static com.pysarenko.feedbackbot.utils.TelegramUtils.forwardMessage;
-import static com.pysarenko.feedbackbot.utils.TelegramUtils.sendMessage;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildForwardMessage;
+import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildMessage;
 import static java.util.Objects.nonNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -24,15 +25,16 @@ public class TelegramMessageHandler {
 
   public void handleMessage(Update update) throws TelegramApiException {
     var message = update.getMessage();
-    if (message == null || message.getText() == null){
+    if (message == null) {
       return;
     }
 
     sendWelcomeMessage(message);
 
+    sendReplyMessageByUserId(message);
     var replyToMessage = message.getReplyToMessage();
     if (nonNull(replyToMessage)) {
-      sendReplyMessage(update, replyToMessage);
+      sendReplyMessageByUserId(update, replyToMessage);
     } else {
       forwardMessageToAdmin(update);
     }
@@ -42,34 +44,49 @@ public class TelegramMessageHandler {
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
     var username = String.valueOf(update.getMessage().getFrom().getUserName());
     var messageId = update.getMessage().getMessageId();
-    var forwardMessage = forwardMessage(ADMIN_ID.getValue(), fromChatId, messageId);
-
-    send(forwardMessage);
-    log.info("Forwarded message to admin from user with id=[{}] and username [{}]", fromChatId, username);
+    if(!Objects.equals(fromChatId, ADMIN_ID.getValue())){
+      var forwardMessage = buildForwardMessage(ADMIN_ID.getValue(), fromChatId, messageId);
+      sendMessage(forwardMessage);
+      sendMessage(buildMessage(ADMIN_ID.getValue(), "Forwarded message from userId #" + fromChatId));
+      log.info("Forwarded message to admin from user with id=[{}] and username [{}]", fromChatId, username);
+    }
   }
 
-  private void sendReplyMessage(Update update, Message replyToMessage) throws TelegramApiException {
+  private void sendReplyMessageByUserId(Update update, Message replyToMessage) throws TelegramApiException {
     var userId = Optional.ofNullable(replyToMessage.getForwardFrom())
         .map(User::getId)
         .orElseThrow(TelegramApiException::new);
     var userName = replyToMessage.getForwardFrom().getUserName();
     var text = update.getMessage().getText();
-    var message = sendMessage(String.valueOf(userId), text);
+    var message = buildMessage(String.valueOf(userId), text);
 
-    var execute = send(message);
+    var execute = sendMessage(message);
     log.info("Sent message with id [{}] to userId [{}] with username [{}]", execute.getMessageId(), userId, userName);
   }
 
   private void sendWelcomeMessage(Message message) throws TelegramApiException {
-    if (START_PREFIX.contains(message.getText())) {
+    var messageText = Optional.ofNullable(message.getText())
+        .orElse("");
+    if (START_PREFIX.contains(messageText)) {
       var fromChatId = String.valueOf(message.getFrom().getId());
       var username = String.valueOf(message.getFrom().getUserName());
-      send(sendMessage(fromChatId, START_MESSAGE_TEMPLATE));
+      sendMessage(buildMessage(fromChatId, START_MESSAGE_TEMPLATE));
       log.info("Sent welcome message to user with id [{}] and username [{}]", fromChatId, username);
     }
   }
 
-  private <T extends Serializable> T send(BotApiMethod<T> message) throws TelegramApiException {
+  private void sendReplyMessageByUserId(Message message) throws TelegramApiException {
+    var messageText = Optional.ofNullable(message.getText())
+        .orElse("");
+    if (messageText.startsWith("#")) {
+      var userId = messageText.substring(1, messageText.indexOf(" "));
+      var replyMessageText = messageText.substring(messageText.indexOf(" ") + 1);
+      var execute = sendMessage(buildMessage(userId, replyMessageText));
+      log.info("Sent message with id [{}] to userId [{}]", execute.getMessageId(), userId);
+    }
+  }
+
+  private <T extends Serializable> T sendMessage(BotApiMethod<T> message) throws TelegramApiException {
       return SENDER.execute(message);
   }
 }

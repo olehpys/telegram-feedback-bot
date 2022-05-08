@@ -13,14 +13,14 @@ public class TelegramUtils {
       "This bot will help you to stay in touch with the " + Environment.CHANNEL_ID.getValue() + " channel administration. " +
       "Just drop a message next and we will text you back shortly!";
 
-  public static SendMessage sendMessage(String chatId, String message) {
+  public static SendMessage buildMessage(String chatId, String message) {
     SendMessage sendMessage = new SendMessage();
     sendMessage.setChatId(chatId);
     sendMessage.setText(message);
     return sendMessage;
   }
 
-  public static ForwardMessage forwardMessage(String targetChatId, String fromChatId, Integer messageId) {
+  public static ForwardMessage buildForwardMessage(String targetChatId, String fromChatId, Integer messageId) {
     return new ForwardMessage(targetChatId, fromChatId, messageId);
   }
 }
