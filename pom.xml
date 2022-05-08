@@ -15,7 +15,7 @@
     <aws.lambda.version>1.2.1</aws.lambda.version>
     <lombok.version>1.18.22</lombok.version>
     <gitflow.version>1.18.0</gitflow.version>
-    <telegrambots.version>5.7.1</telegrambots.version>
+    <telegrambots.version>6.0.1</telegrambots.version>
     <jackson.jsr310.version>2.13.2</jackson.jsr310.version>
     <slfj.version>1.7.36</slfj.version>
     <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
