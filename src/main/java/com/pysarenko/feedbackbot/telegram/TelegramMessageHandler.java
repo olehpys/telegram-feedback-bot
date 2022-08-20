@@ -34,7 +34,7 @@ public class TelegramMessageHandler {
     sendReplyMessageByUserId(message);
     var replyToMessage = message.getReplyToMessage();
     if (nonNull(replyToMessage)) {
-      sendReplyMessageByUserId(update, replyToMessage);
+      sendReplyMessage(update, replyToMessage);
     } else {
       forwardMessageToAdmin(update);
     }
@@ -47,12 +47,12 @@ public class TelegramMessageHandler {
     if(!Objects.equals(fromChatId, ADMIN_ID.getValue())){
       var forwardMessage = buildForwardMessage(ADMIN_ID.getValue(), fromChatId, messageId);
       sendMessage(forwardMessage);
-      sendMessage(buildMessage(ADMIN_ID.getValue(), "Forwarded message from userId #" + fromChatId));
+      sendMessage(buildMessage(ADMIN_ID.getValue(), "Forwarded message from userId #id" + fromChatId));
       log.info("Forwarded message to admin from user with id=[{}] and username [{}]", fromChatId, username);
     }
   }
 
-  private void sendReplyMessageByUserId(Update update, Message replyToMessage) throws TelegramApiException {
+  private void sendReplyMessage(Update update, Message replyToMessage) throws TelegramApiException {
     var userId = Optional.ofNullable(replyToMessage.getForwardFrom())
         .map(User::getId)
         .orElseThrow(TelegramApiException::new);
@@ -78,8 +78,8 @@ public class TelegramMessageHandler {
   private void sendReplyMessageByUserId(Message message) throws TelegramApiException {
     var messageText = Optional.ofNullable(message.getText())
         .orElse("");
-    if (messageText.startsWith("#")) {
-      var userId = messageText.substring(1, messageText.indexOf(" "));
+    if (messageText.startsWith("#id")) {
+      var userId = messageText.substring(3, messageText.indexOf(" "));
       var replyMessageText = messageText.substring(messageText.indexOf(" ") + 1);
       var execute = sendMessage(buildMessage(userId, replyMessageText));
       log.info("Sent message with id [{}] to userId [{}]", execute.getMessageId(), userId);
