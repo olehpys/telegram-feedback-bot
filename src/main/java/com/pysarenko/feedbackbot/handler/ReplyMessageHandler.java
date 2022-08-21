@@ -42,9 +42,9 @@ public class ReplyMessageHandler extends MessageHandler {
   private void sendReplyMessageByUserId(Update update, Message replyToMessage) {
     var text = update.getMessage().getText();
     var replyToMessageText = replyToMessage.getText();
-      var userId = replyToMessageText.substring(replyToMessageText.lastIndexOf(ID_PREFIX) + ID_PREFIX.length());
+    var userId = replyToMessageText.substring(replyToMessageText.lastIndexOf(ID_PREFIX) + ID_PREFIX.length());
 
-      var execute = sendMessage(buildMessage(userId, text));
-      log.info("Sent message with id: {} to userId: {}", execute.getMessageId(), userId);
+    var execute = sendMessage(buildMessage(userId, text));
+    log.info("Sent message with id: {} to userId: {}", execute.getMessageId(), userId);
   }
 }
