@@ -15,4 +15,9 @@ public class JsonMapper {
   public <T> T readValue(String json, Class<T> requiredClass) {
     return MAPPER.readValue(json, requiredClass);
   }
+
+  @SneakyThrows
+  public <T> String toJson(T object) {
+      return MAPPER.writeValueAsString(object);
+  }
 }

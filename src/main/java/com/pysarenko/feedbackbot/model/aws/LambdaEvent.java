@@ -1,19 +1,17 @@
 package com.pysarenko.feedbackbot.model.aws;
 
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ApiGatewayResponse {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LambdaEvent {
 
-  private int statusCode;
-  private Map<String, String> headers;
+  @JsonRawValue
   private String body;
-  private boolean isBase64Encoded;
 }
