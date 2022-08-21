@@ -1,6 +1,7 @@
 package com.pysarenko.feedbackbot.handler;
 
 import static com.pysarenko.feedbackbot.model.Environment.ADMIN_ID;
+import static com.pysarenko.feedbackbot.model.Environment.BOT_USERNAME;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildForwardMessage;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildMessage;
 import static java.util.Objects.isNull;
@@ -15,7 +16,9 @@ public class ForwardMessageHandler extends MessageHandler {
   @Override
   public boolean isApplicable(Update update) {
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
-    return update.hasMessage() && isNull(update.getMessage().getReplyToMessage())
+    var replyToMessage = update.getMessage().getReplyToMessage();
+    return update.hasMessage() && (isNull(replyToMessage)
+        || replyToMessage.getFrom().getUserName().equals(BOT_USERNAME.getValue()))
         && !Objects.equals(fromChatId, ADMIN_ID.getValue());
   }
 
@@ -24,9 +27,8 @@ public class ForwardMessageHandler extends MessageHandler {
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
     var username = String.valueOf(update.getMessage().getFrom().getUserName());
     var messageId = update.getMessage().getMessageId();
-    var forwardMessage = buildForwardMessage(ADMIN_ID.getValue(), fromChatId, messageId);
 
-    sendMessage(forwardMessage);
+    sendMessage(buildForwardMessage(ADMIN_ID.getValue(), fromChatId, messageId));
     sendMessage(buildMessage(ADMIN_ID.getValue(), "Forwarded message from userId: #id" + fromChatId));
     log.info("Forwarded message to admin from userId: {} and username: {}", fromChatId, username);
   }
