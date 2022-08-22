@@ -3,7 +3,7 @@
 
 This bot allows to send feedback messages to the channel owner and reply to them.
 
-## AWS Lambda deploy steps:
+## AWS Lambda deploy steps
 
 1. Create Lambda function on AWS
 2. Edit runtime settings
