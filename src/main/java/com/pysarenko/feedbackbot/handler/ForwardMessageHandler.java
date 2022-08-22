@@ -25,7 +25,7 @@ public class ForwardMessageHandler extends MessageHandler {
   @Override
   public void handle(Update update) {
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
-    var username = String.valueOf(update.getMessage().getFrom().getUserName());
+    var username = update.getMessage().getFrom().getUserName();
     var messageId = update.getMessage().getMessageId();
 
     sendMessage(buildForwardMessage(ADMIN_ID.getValue(), fromChatId, messageId));

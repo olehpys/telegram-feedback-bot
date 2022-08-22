@@ -19,7 +19,7 @@ public class WelcomeMessageHandler extends MessageHandler {
   public void handle(Update update) {
     var message = update.getMessage();
     var fromChatId = String.valueOf(message.getFrom().getId());
-    var username = String.valueOf(message.getFrom().getUserName());
+    var username = message.getFrom().getUserName();
 
     sendMessage(buildMessage(fromChatId, START_MESSAGE_TEMPLATE));
     log.info("Sent welcome message to user with id: {} and username: {}", fromChatId, username);
