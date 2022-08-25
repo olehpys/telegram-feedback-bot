@@ -1,14 +1,18 @@
 package com.pysarenko.feedbackbot.handler;
 
-import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_MESSAGE_TEMPLATE;
-import static com.pysarenko.feedbackbot.utils.TelegramUtils.START_PREFIX;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildMessage;
 
+import com.pysarenko.feedbackbot.model.Environment;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 public class WelcomeMessageHandler extends MessageHandler {
+
+  private static final String START_PREFIX = "/start";
+  private static final String START_MESSAGE_TEMPLATE = "Hi there!\n" +
+      "This bot will help you to stay in touch with the " + Environment.CHANNEL_ID.getValue() + " channel administration. " +
+      "Just drop a message next and we will text you back shortly!";
 
   @Override
   public boolean isApplicable(Update update) {

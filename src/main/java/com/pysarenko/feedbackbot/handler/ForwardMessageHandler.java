@@ -15,6 +15,10 @@ public class ForwardMessageHandler extends MessageHandler {
 
   @Override
   public boolean isApplicable(Update update) {
+    if (!update.hasMessage()) {
+      return false;
+    }
+
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
     var replyToMessage = update.getMessage().getReplyToMessage();
     return update.hasMessage() && (isNull(replyToMessage)

@@ -14,6 +14,10 @@ public class ReplyMessageHandler extends MessageHandler {
 
   @Override
   public boolean isApplicable(Update update) {
+    if (!update.hasMessage()) {
+      return false;
+    }
+
     var replyToMessage = update.getMessage().getReplyToMessage();
     return isTextMessage(update) && nonNull(replyToMessage) && nonNull(replyToMessage.getText());
   }
