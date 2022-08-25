@@ -21,8 +21,9 @@ public class ForwardMessageHandler extends MessageHandler {
 
     var fromChatId = String.valueOf(update.getMessage().getFrom().getId());
     var replyToMessage = update.getMessage().getReplyToMessage();
-    return update.hasMessage() && (isNull(replyToMessage)
-        || replyToMessage.getFrom().getUserName().equals(BOT_USERNAME.getValue()))
+    return update.hasMessage() &&
+        (isNull(replyToMessage) || BOT_USERNAME.getValue().equals(replyToMessage.getFrom().getUserName())
+            || fromChatId.equals(String.valueOf(replyToMessage.getFrom().getId())))
         && !Objects.equals(fromChatId, ADMIN_ID.getValue());
   }
 
