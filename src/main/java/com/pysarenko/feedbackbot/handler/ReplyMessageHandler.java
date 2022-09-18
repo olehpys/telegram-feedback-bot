@@ -3,9 +3,11 @@ package com.pysarenko.feedbackbot.handler;
 import static com.pysarenko.feedbackbot.utils.TelegramUtils.buildMessage;
 import static java.util.Objects.nonNull;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 @Slf4j
 public class ReplyMessageHandler extends MessageHandler {
@@ -34,13 +36,16 @@ public class ReplyMessageHandler extends MessageHandler {
   }
 
   private void sendReplyMessageByUserName(Update update, Message replyToMessage) {
-    var userId = replyToMessage.getForwardFrom().getId();
-    var userName = replyToMessage.getForwardFrom().getUserName();
-    var text = update.getMessage().getText();
-    var message = buildMessage(String.valueOf(userId), text);
+    Optional.ofNullable(replyToMessage.getForwardFrom())
+        .map(User::getId)
+        .ifPresentOrElse(userId -> {
+          var userName = replyToMessage.getForwardFrom().getUserName();
+          var text = update.getMessage().getText();
+          var message = buildMessage(String.valueOf(userId), text);
 
-    var execute = sendMessage(message);
-    log.info("Sent message with id: {} to userId: {} with username: {}", execute.getMessageId(), userId, userName);
+          var execute = sendMessage(message);
+          log.info("Sent message with userId: {} to userId: {} with username: {}", execute.getMessageId(), userId, userName);
+        }, () -> log.warn("Message to reply doesn't contain username to send the message"));
   }
 
   private void sendReplyMessageByUserId(Update update, Message replyToMessage) {
